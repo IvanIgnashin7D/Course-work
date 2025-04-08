@@ -61,8 +61,7 @@ int knapsackDP(int w, std::vector<int>& weights, std::vector<int>& values, int n
     return dp[n][w];
 }
 
-// values  = { 60, 100, 120 };
-// weights = { 10, 20,  30  };
+
 int knapsackBacktracking(int w, std::vector<int>& weights, std::vector<int>& values, int i, int current_weight, int current_value) {
     if (i == weights.size() || current_weight >= w) {
         return current_value;

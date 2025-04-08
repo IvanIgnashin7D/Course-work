@@ -11,6 +11,7 @@ int knapsackBranchAndBound(int W, std::vector<int>& weights, std::vector<int>& v
 
 int main() {
 	std::cout << "Hello world" << '\n';
+    return 0;
 }
 
 
@@ -69,7 +70,6 @@ int knapsackBranchAndBound(int W, std::vector<int>& weights, std::vector<int>& v
     if (i == weights.size() || current_weight >= W) {
         return best_value;
     }
-    // Верхняя оценка (жадный подход с дробными предметами)
     double bound = current_value;
     int remaining_weight = W - current_weight;
     int j = i;
@@ -84,9 +84,7 @@ int knapsackBranchAndBound(int W, std::vector<int>& weights, std::vector<int>& v
     if (bound <= best_value) {
         return best_value;
     }
-    // Берём текущий предмет
     knapsackBranchAndBound(W, weights, values, i + 1, current_weight + weights[i], current_value + values[i], best_value);
-    // Не берём текущий предмет
     knapsackBranchAndBound(W, weights, values, i + 1, current_weight, current_value, best_value);
     return best_value;
 }

@@ -3,10 +3,10 @@
 #include <algorithm>
 
 
-int knapsackBruteForce(int w, std::vector<int>& weights, std::vector<int>& values, int n); // grubaya sila
-int knapsackDP(int w, std::vector<int>& weights, std::vector<int>& values, int n); // dinamicheskoe programmirovanie
-int knapsackBacktracking(int w, std::vector<int>& weights, std::vector<int>& values, int i, int current_weight, int current_value); // poisk s vozvratom
-int knapsackBranchAndBound(int w, std::vector<int>& weights, std::vector<int>& values, int i, int current_weight, int current_value, int& best_value); // vetvi i granitsi
+int knapsackBruteForce(int w, std::vector<int>& weights, std::vector<int>& values, int n);
+int knapsackDP(int w, std::vector<int>& weights, std::vector<int>& values, int n);
+int knapsackBacktracking(int w, std::vector<int>& weights, std::vector<int>& values, int i, int current_weight, int current_value);
+int knapsackBranchAndBound(int w, std::vector<int>& weights, std::vector<int>& values, int i, int current_weight, int current_value, int& best_value);
 
 
 int main() {

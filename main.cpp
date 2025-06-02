@@ -11,10 +11,16 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n, int i, int c
 int main() {
     std::setlocale(0, "");
 
-    const int n = 15;
-    int values[n]{ 45, 72, 18, 91, 33, 120, 25, 55, 80, 30, 68, 95, 12, 50, 77 };
-    int weights[n]{ 8, 12, 5, 17, 9, 23, 6, 11, 15, 7, 14, 19, 3, 10, 13 };
-    int w = 90;
+    const int n = 20;
+    int values[n]{
+        45, 72, 18, 91, 33, 120, 25, 55, 80, 30,
+        68, 95, 12, 50, 77, 60, 110, 40, 85, 65
+    };
+    int weights[n]{
+        8, 12, 5, 17, 9, 23, 6, 11, 15, 7,
+        14, 19, 3, 10, 13, 11, 27, 8, 16, 12
+    };
+    int w = 100;
 
 
     std::cout << std::fixed << std::setprecision(6);
@@ -108,16 +114,13 @@ int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int c
 }
 
 void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
-    // Простая сортировка пузырьком
     for (int i = 0; i < n - 1; ++i) {
         for (int j = 0; j < n - i - 1; ++j) {
             if (valuePerWeight[j] < valuePerWeight[j + 1]) {
-                // Меняем местами valuePerWeight
                 double tempVal = valuePerWeight[j];
                 valuePerWeight[j] = valuePerWeight[j + 1];
                 valuePerWeight[j + 1] = tempVal;
 
-                // Меняем местами индексы
                 int tempIdx = indices[j];
                 indices[j] = indices[j + 1];
                 indices[j + 1] = tempIdx;
@@ -128,7 +131,6 @@ void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
 
 int knapsackBranchAndBound(int w, int* weights, int* values, int n,
     int i, int current_weight, int current_value, int* best_value) {
-    // Сортируем предметы по убыванию удельной ценности (value/weight)
     double* valuePerWeight = new double[n];
     int* indices = new int[n];
     for (int j = 0; j < n; ++j) {
@@ -137,7 +139,6 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n,
     }
     sortItemsByValuePerWeight(valuePerWeight, indices, n);
 
-    // Создаем временные массивы для отсортированных весов и ценностей
     int* sortedWeights = new int[n];
     int* sortedValues = new int[n];
     for (int j = 0; j < n; ++j) {
@@ -145,13 +146,11 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n,
         sortedValues[j] = values[indices[j]];
     }
 
-    // Обновляем исходные массивы (если нужно)
     for (int j = 0; j < n; ++j) {
         weights[j] = sortedWeights[j];
         values[j] = sortedValues[j];
     }
 
-    // Освобождаем временные массивы
     delete[] valuePerWeight;
     delete[] indices;
     delete[] sortedWeights;
@@ -164,7 +163,6 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n,
         return *best_value;
     }
 
-    // Вычисляем верхнюю границу
     double bound = current_value;
     int remaining_weight = w - current_weight;
     int j = i;
@@ -181,7 +179,6 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n,
         return *best_value;
     }
 
-    // Рекурсивно проверяем варианты с взятием и без взятия текущего предмета
     knapsackBranchAndBound(w, weights, values, n, i + 1,
         current_weight + weights[i], current_value + values[i], best_value);
     knapsackBranchAndBound(w, weights, values, n, i + 1,

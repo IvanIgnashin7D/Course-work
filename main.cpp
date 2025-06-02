@@ -6,20 +6,16 @@
 int knapsackBruteForce(int W, int weights[], int values[], int n);
 int knapsackDP(int w, int weights[], int values[], int n);
 int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int current_weight, int current_value);
-int knapsackBranchAndBound(int w, int weights[], int values[], int n, int i, int current_weight, int current_value, int& best_value);
+int knapsackBranchAndBound(int w, int* weights, int* values, int n, int i, int current_weight, int current_value, int* best_value);
 
 int main() {
     std::setlocale(0, "");
 
     const int n = 15;
-    int values[n];
-    int weights[n];
-    int w = 2000;
+    int values[n]{ 45, 72, 18, 91, 33, 120, 25, 55, 80, 30, 68, 95, 12, 50, 77 };
+    int weights[n]{ 8, 12, 5, 17, 9, 23, 6, 11, 15, 7, 14, 19, 3, 10, 13 };
+    int w = 90;
 
-    for (int i = 0; i < n; i++) {
-        weights[i] = 10 + i % 20;
-        values[i] = 50 + i % 100;
-    }
 
     std::cout << std::fixed << std::setprecision(6);
 
@@ -43,7 +39,7 @@ int main() {
 
     int best_value = 0;
     start = std::chrono::high_resolution_clock::now();
-    int branchAndBoundResult = knapsackBranchAndBound(w, weights, values, n, 0, 0, 0, best_value);
+    int branchAndBoundResult = knapsackBranchAndBound(w, weights, values, n, 0, 0, 0, &best_value);
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> branchAndBoundTime = end - start;
     std::cout << "Метод ветвей и границ:                " << branchAndBoundResult << " (Время: " << branchAndBoundTime.count() << " сек)\n";
@@ -68,17 +64,34 @@ int knapsackBruteForce(int W, int weights[], int values[], int n) {
     return max_value;
 }
 
-int* knapsackDP(int w, int weights[], int values[], int n) {
-    int** dp = new int* [w + 1];
-    std::fill(dp, dp + w + 1, 0);
-
-    for (int i = 0; i < n; i++) {
-        for (int j = w; j >= weights[i]; j--) {
-            dp[j] = std::max(dp[j], dp[j - weights[i]] + values[i]);
+int knapsackDP(int w, int weights[], int values[], int n) {
+    int** dp = new int* [n + 1];
+    for (int i = 0; i <= n; i++) {
+        dp[i] = new int[w + 1];
+        for (int j = 0; j <= w; j++) {
+            dp[i][j] = 0;
         }
     }
 
-    return dp[w];
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= w; j++) {
+            if (weights[i - 1] <= j) {
+                dp[i][j] = std::max(dp[i - 1][j], values[i - 1] + dp[i - 1][j - weights[i - 1]]);
+            }
+            else {
+                dp[i][j] = dp[i - 1][j];
+            }
+        }
+    }
+
+    int result = dp[n][w];
+
+    for (int i = 0; i <= n; i++) {
+        delete[] dp[i];
+    }
+    delete[] dp;
+
+    return result;
 }
 
 int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int current_weight, int current_value) {
@@ -94,13 +107,64 @@ int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int c
     );
 }
 
-int knapsackBranchAndBound(int w, int weights[], int values[], int n, int i, int current_weight, int current_value, int& best_value) {
-    if (current_weight <= w && current_value > best_value) {
-        best_value = current_value;
+void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
+    // Простая сортировка пузырьком
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (valuePerWeight[j] < valuePerWeight[j + 1]) {
+                // Меняем местами valuePerWeight
+                double tempVal = valuePerWeight[j];
+                valuePerWeight[j] = valuePerWeight[j + 1];
+                valuePerWeight[j + 1] = tempVal;
+
+                // Меняем местами индексы
+                int tempIdx = indices[j];
+                indices[j] = indices[j + 1];
+                indices[j + 1] = tempIdx;
+            }
+        }
+    }
+}
+
+int knapsackBranchAndBound(int w, int* weights, int* values, int n,
+    int i, int current_weight, int current_value, int* best_value) {
+    // Сортируем предметы по убыванию удельной ценности (value/weight)
+    double* valuePerWeight = new double[n];
+    int* indices = new int[n];
+    for (int j = 0; j < n; ++j) {
+        valuePerWeight[j] = (double)values[j] / weights[j];
+        indices[j] = j;
+    }
+    sortItemsByValuePerWeight(valuePerWeight, indices, n);
+
+    // Создаем временные массивы для отсортированных весов и ценностей
+    int* sortedWeights = new int[n];
+    int* sortedValues = new int[n];
+    for (int j = 0; j < n; ++j) {
+        sortedWeights[j] = weights[indices[j]];
+        sortedValues[j] = values[indices[j]];
+    }
+
+    // Обновляем исходные массивы (если нужно)
+    for (int j = 0; j < n; ++j) {
+        weights[j] = sortedWeights[j];
+        values[j] = sortedValues[j];
+    }
+
+    // Освобождаем временные массивы
+    delete[] valuePerWeight;
+    delete[] indices;
+    delete[] sortedWeights;
+    delete[] sortedValues;
+
+    if (current_weight <= w && current_value > *best_value) {
+        *best_value = current_value;
     }
     if (i == n || current_weight >= w) {
-        return best_value;
+        return *best_value;
     }
+
+    // Вычисляем верхнюю границу
     double bound = current_value;
     int remaining_weight = w - current_weight;
     int j = i;
@@ -112,10 +176,16 @@ int knapsackBranchAndBound(int w, int weights[], int values[], int n, int i, int
     if (j < n) {
         bound += (double)values[j] * remaining_weight / weights[j];
     }
-    if (bound <= best_value) {
-        return best_value;
+
+    if (bound <= *best_value) {
+        return *best_value;
     }
-    knapsackBranchAndBound(w, weights, values, n, i + 1, current_weight + weights[i], current_value + values[i], best_value);
-    knapsackBranchAndBound(w, weights, values, n, i + 1, current_weight, current_value, best_value);
-    return best_value;
+
+    // Рекурсивно проверяем варианты с взятием и без взятия текущего предмета
+    knapsackBranchAndBound(w, weights, values, n, i + 1,
+        current_weight + weights[i], current_value + values[i], best_value);
+    knapsackBranchAndBound(w, weights, values, n, i + 1,
+        current_weight, current_value, best_value);
+
+    return *best_value;
 }

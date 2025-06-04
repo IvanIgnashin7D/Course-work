@@ -8,6 +8,7 @@ int knapsackDP(int w, int weights[], int values[], int n);
 int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int current_weight, int current_value);
 void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n);
 int knapsackBranchAndBound(int w, int* weights, int* values, int n, int i, int current_weight, int current_value, int* best_value);
+inline int max(int a, int b);
 
 int main() {
     std::setlocale(0, "");
@@ -83,7 +84,7 @@ int knapsackDP(int w, int weights[], int values[], int n) {
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= w; j++) {
             if (weights[i - 1] <= j) {
-                dp[i][j] = std::max(dp[i - 1][j], values[i - 1] + dp[i - 1][j - weights[i - 1]]);
+                dp[i][j] = max(dp[i - 1][j], values[i - 1] + dp[i - 1][j - weights[i - 1]]);
             }
             else {
                 dp[i][j] = dp[i - 1][j];
@@ -108,7 +109,7 @@ int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int c
     if (current_weight + weights[i] > w) {
         return knapsackBacktracking(w, weights, values, n, i + 1, current_weight, current_value);
     }
-    return std::max(
+    return max(
         knapsackBacktracking(w, weights, values, n, i + 1, current_weight + weights[i], current_value + values[i]),
         knapsackBacktracking(w, weights, values, n, i + 1, current_weight, current_value)
     );
@@ -186,4 +187,8 @@ void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
             }
         }
     }
+}
+
+inline int max(int a, int b) {
+    return (a > b) ? a : b;
 }

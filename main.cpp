@@ -6,6 +6,7 @@
 int knapsackBruteForce(int W, int weights[], int values[], int n);
 int knapsackDP(int w, int weights[], int values[], int n);
 int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int current_weight, int current_value);
+void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n);
 int knapsackBranchAndBound(int w, int* weights, int* values, int n, int i, int current_weight, int current_value, int* best_value);
 
 int main() {
@@ -113,22 +114,6 @@ int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int c
     );
 }
 
-void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
-    for (int i = 0; i < n - 1; ++i) {
-        for (int j = 0; j < n - i - 1; ++j) {
-            if (valuePerWeight[j] < valuePerWeight[j + 1]) {
-                double tempVal = valuePerWeight[j];
-                valuePerWeight[j] = valuePerWeight[j + 1];
-                valuePerWeight[j + 1] = tempVal;
-
-                int tempIdx = indices[j];
-                indices[j] = indices[j + 1];
-                indices[j + 1] = tempIdx;
-            }
-        }
-    }
-}
-
 int knapsackBranchAndBound(int w, int* weights, int* values, int n,
     int i, int current_weight, int current_value, int* best_value) {
     double* valuePerWeight = new double[n];
@@ -185,4 +170,20 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n,
         current_weight, current_value, best_value);
 
     return *best_value;
+}
+
+void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (valuePerWeight[j] < valuePerWeight[j + 1]) {
+                double tempVal = valuePerWeight[j];
+                valuePerWeight[j] = valuePerWeight[j + 1];
+                valuePerWeight[j + 1] = tempVal;
+
+                int tempIdx = indices[j];
+                indices[j] = indices[j + 1];
+                indices[j + 1] = tempIdx;
+            }
+        }
+    }
 }

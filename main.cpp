@@ -77,18 +77,26 @@ int knapsackBruteForce(int W, int weights[], int values[], int n) {
 
 int knapsackDP(int w, int weights[], int values[], int n) {
     int* prev = new int[w + 1]();
-    int* curr = new int[w + 1];
+    int* curr = new int[w + 1]();
 
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= w; j++) {
             if (weights[i - 1] <= j) {
-                curr[j] = max(prev[j], values[i - 1] + prev[j - weights[i - 1]]);
+                int with_item = values[i - 1] + prev[j - weights[i - 1]];
+                curr[j] = (prev[j] > with_item) ? prev[j] : with_item;
             }
             else {
                 curr[j] = prev[j];
             }
         }
-        std::swap(prev, curr);
+
+        int* temp = prev;
+        prev = curr;
+        curr = temp;
+
+        for (int j = 0; j <= w; j++) {
+            curr[j] = 0;
+        }
     }
 
     int result = prev[w];

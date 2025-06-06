@@ -14,16 +14,19 @@ inline int max(int a, int b);
 int main() {
     std::setlocale(0, "");
 
-    const int n = 20;
-    int values[n]{
+    const int n = 25;
+    int values[n] = {
         45, 72, 18, 91, 33, 120, 25, 55, 80, 30,
-        68, 95, 12, 50, 77, 60, 110, 40, 85, 65
+        68, 95, 12, 50, 77, 60, 110, 40, 85, 65,
+        42, 78, 22, 88, 37
     };
-    int weights[n]{
+
+    int weights[n] = {
         8, 12, 5, 17, 9, 23, 6, 11, 15, 7,
-        14, 19, 3, 10, 13, 11, 27, 8, 16, 12
+        14, 19, 3, 10, 13, 11, 27, 8, 16, 12,
+        7, 13, 4, 16, 8
     };
-    int w = 100;
+    int w = 50;
 
 
     std::cout << std::fixed << std::setprecision(6);
@@ -73,32 +76,24 @@ int knapsackBruteForce(int W, int weights[], int values[], int n) {
 }
 
 int knapsackDP(int w, int weights[], int values[], int n) {
-    int** dp = new int* [n + 1];
-    for (int i = 0; i <= n; i++) {
-        dp[i] = new int[w + 1];
-        for (int j = 0; j <= w; j++) {
-            dp[i][j] = 0;
-        }
-    }
+    int* prev = new int[w + 1]();
+    int* curr = new int[w + 1];
 
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= w; j++) {
             if (weights[i - 1] <= j) {
-                dp[i][j] = max(dp[i - 1][j], values[i - 1] + dp[i - 1][j - weights[i - 1]]);
+                curr[j] = max(prev[j], values[i - 1] + prev[j - weights[i - 1]]);
             }
             else {
-                dp[i][j] = dp[i - 1][j];
+                curr[j] = prev[j];
             }
         }
+        std::swap(prev, curr);
     }
 
-    int result = dp[n][w];
-
-    for (int i = 0; i <= n; i++) {
-        delete[] dp[i];
-    }
-    delete[] dp;
-
+    int result = prev[w];
+    delete[] prev;
+    delete[] curr;
     return result;
 }
 

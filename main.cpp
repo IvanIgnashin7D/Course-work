@@ -7,6 +7,7 @@ int knapsackBruteForce(int W, int weights[], int values[], int n);
 int knapsackDP(int w, int weights[], int values[], int n);
 int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int current_weight, int current_value);
 void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n);
+int knapsackBranchAndBound(int w, int* weights, int* values, int n);
 int knapsackBranchAndBound(int w, int* weights, int* values, int n, int i, int current_weight, int current_value, int* best_value);
 inline int max(int a, int b);
 
@@ -45,9 +46,8 @@ int main() {
     std::chrono::duration<double> backtrackingTime = end - start;
     std::cout << "Метод поиска с возвратом:             " << backtrackingResult << " (Время: " << backtrackingTime.count() << " сек)\n";
 
-    int best_value = 0;
     start = std::chrono::high_resolution_clock::now();
-    int branchAndBoundResult = knapsackBranchAndBound(w, weights, values, n, 0, 0, 0, &best_value);
+    int branchAndBoundResult = knapsackBranchAndBound(w, weights, values, n);
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> branchAndBoundTime = end - start;
     std::cout << "Метод ветвей и границ:                " << branchAndBoundResult << " (Время: " << branchAndBoundTime.count() << " сек)\n";
@@ -115,8 +115,7 @@ int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int c
     );
 }
 
-int knapsackBranchAndBound(int w, int* weights, int* values, int n,
-    int i, int current_weight, int current_value, int* best_value) {
+int knapsackBranchAndBound(int w, int* weights, int* values, int n) {
     double* valuePerWeight = new double[n];
     int* indices = new int[n];
     for (int j = 0; j < n; ++j) {
@@ -141,6 +140,13 @@ int knapsackBranchAndBound(int w, int* weights, int* values, int n,
     delete[] indices;
     delete[] sortedWeights;
     delete[] sortedValues;
+
+    int best_value = 0;
+    return knapsackBranchAndBound(w, weights, values, n, 0, 0, 0, &best_value);
+}
+
+int knapsackBranchAndBound(int w, int* weights, int* values, int n,
+    int i, int current_weight, int current_value, int* best_value) {
 
     if (current_weight <= w && current_value > *best_value) {
         *best_value = current_value;

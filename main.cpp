@@ -14,7 +14,7 @@ inline int max(int a, int b);
 int main() {
     std::setlocale(0, "");
 
-    const int n = 25;
+    /*const int n = 25;
     int values[n] = {
         45, 72, 18, 91, 33, 120, 25, 55, 80, 30,
         68, 95, 12, 50, 77, 60, 110, 40, 85, 65,
@@ -26,7 +26,12 @@ int main() {
         14, 19, 3, 10, 13, 11, 27, 8, 16, 12,
         7, 13, 4, 16, 8
     };
-    int w = 50;
+    int w = 50;*/
+
+    const int n = 3;
+    int values[n] = { 12, 9, 4 };
+    int weights[n] = { 6, 5, 4 };
+    int w = 10;
 
 
     std::cout << std::fixed << std::setprecision(6);
@@ -121,22 +126,22 @@ int knapsackBacktracking(int w, int weights[], int values[], int n, int i, int c
 int knapsackBranchAndBound(int w, int* weights, int* values, int n) {
     double* valuePerWeight = new double[n];
     int* indices = new int[n];
-    for (int j = 0; j < n; ++j) {
-        valuePerWeight[j] = (double)values[j] / weights[j];
-        indices[j] = j;
+    for (int i = 0; i < n; ++i) {
+        valuePerWeight[i] = (double)values[i] / weights[i];
+        indices[i] = i;
     }
     sortItemsByValuePerWeight(valuePerWeight, indices, n);
 
     int* sortedWeights = new int[n];
     int* sortedValues = new int[n];
-    for (int j = 0; j < n; ++j) {
-        sortedWeights[j] = weights[indices[j]];
-        sortedValues[j] = values[indices[j]];
+    for (int i = 0; i < n; ++i) {
+        sortedWeights[i] = weights[indices[i]];
+        sortedValues[i] = values[indices[i]];
     }
 
-    for (int j = 0; j < n; ++j) {
-        weights[j] = sortedWeights[j];
-        values[j] = sortedValues[j];
+    for (int i = 0; i < n; ++i) {
+        weights[i] = sortedWeights[i];
+        values[i] = sortedValues[i];
     }
 
     delete[] valuePerWeight;
@@ -190,9 +195,9 @@ void sortItemsByValuePerWeight(double* valuePerWeight, int* indices, int n) {
                 valuePerWeight[j] = valuePerWeight[j + 1];
                 valuePerWeight[j + 1] = tempVal;
 
-                int tempIdx = indices[j];
+                int tempId = indices[j];
                 indices[j] = indices[j + 1];
-                indices[j + 1] = tempIdx;
+                indices[j + 1] = tempId;
             }
         }
     }
